@@ -14,12 +14,10 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
                        Deeplink Marketplace SDK for exchanging clicks
                        DESC
-  s.homepage         = "https://github.com/cellogic/deeplink-marketplace-sdk"
-  # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
+  s.homepage         = "https://github.com/deeplinkme/ios-appwords-sdk"
   s.license          = 'MIT'
   s.author           = { "Amit Attias" => "amit@deeplink.me" }
-  s.source           = { :git => "https://github.com/cellogic/deeplink-marketplace-sdk.git", :tag => "V0.3" }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  s.source           = { :git => "https://github.com/deeplinkme/ios-appwords-sdk.git", :tag => "V0.3" }
 
   s.platform     = :ios, '7.0'
   s.requires_arc = true
@@ -29,8 +27,6 @@ Pod::Spec.new do |s|
     'AppWords' => ['Pod/Assets/*.png']
   }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
   s.frameworks = 'AdSupport'
   s.vendored_frameworks = 'Pod/Classes/AppWordsSDK.framework'
-  # s.dependency 'AFNetworking', '~> 2.3'
 end
