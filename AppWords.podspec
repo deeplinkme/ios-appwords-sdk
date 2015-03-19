@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
   s.homepage         = "https://github.com/deeplinkme/ios-appwords-sdk"
   s.license          = 'MIT'
   s.author           = { "Amit Attias" => "amit@deeplink.me" }
-  s.source           = { :git => "https://github.com/deeplinkme/ios-appwords-sdk.git", :tag => "V0.3" }
+  s.source           = { :git => "https://github.com/deeplinkme/ios-appwords-sdk.git", :tag => "V0.3.1" }
 
   s.platform     = :ios, '7.0'
   s.requires_arc = true
