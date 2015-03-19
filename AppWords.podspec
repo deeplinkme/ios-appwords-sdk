@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "AppWords"
-  s.version          = "0.3"
+  s.version          = "0.3.1"
   s.summary          = "Deeplink Marketplace SDK"
   s.description      = <<-DESC
                        Deeplink Marketplace SDK for exchanging clicks
