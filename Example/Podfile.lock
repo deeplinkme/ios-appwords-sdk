@@ -1,0 +1,14 @@
+PODS:
+  - AppWords (0.1.0)
+
+DEPENDENCIES:
+  - AppWords (from `../`)
+
+EXTERNAL SOURCES:
+  AppWords:
+    :path: ../
+
+SPEC CHECKSUMS:
+  AppWords: 406846023c61c3787fb8b3001d1cf03f0d6d5383
+
+COCOAPODS: 0.36.0

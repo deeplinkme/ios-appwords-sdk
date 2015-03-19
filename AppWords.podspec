@@ -9,30 +9,28 @@
 
 Pod::Spec.new do |s|
   s.name             = "AppWords"
-  s.version          = "0.1.0"
-  s.summary          = "A short description of AppWords."
+  s.version          = "0.3"
+  s.summary          = "Deeplink Marketplace SDK"
   s.description      = <<-DESC
-                       An optional longer description of AppWords
-
-                       * Markdown format.
-                       * Don't worry about the indent, we strip it!
+                       Deeplink Marketplace SDK for exchanging clicks
                        DESC
-  s.homepage         = "https://github.com/<GITHUB_USERNAME>/AppWords"
+  s.homepage         = "https://github.com/cellogic/deeplink-marketplace-sdk"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
-  s.author           = { "Amit Attias" => "amit@cellogicmobile.com" }
-  s.source           = { :git => "https://github.com/<GITHUB_USERNAME>/AppWords.git", :tag => s.version.to_s }
+  s.author           = { "Amit Attias" => "amit@deeplink.me" }
+  s.source           = { :git => "https://github.com/cellogic/deeplink-marketplace-sdk.git", :tag => "V0.3" }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.platform     = :ios, '7.0'
   s.requires_arc = true
 
-  s.source_files = 'Pod/Classes/**/*'
+  s.source_files = 'Pod/Classes/'
   s.resource_bundles = {
     'AppWords' => ['Pod/Assets/*.png']
   }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
+  s.frameworks = 'AdSupport'
+  s.vendored_frameworks = 'Pod/Classes/AppWordsSDK.framework'
   # s.dependency 'AFNetworking', '~> 2.3'
 end
