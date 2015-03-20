@@ -1,4 +1,4 @@
-<p align="center"><img src="https://www.dropbox.com/s/1bbfjsxi4qilcec/deeplink-appwordsHIGHREZ.png?dl=0" width="204"/></p>
+<p align="center">![AppWords Logo](https://www.dropbox.com/s/1bbfjsxi4qilcec/deeplink-appwordsHIGHREZ.png?dl=0)</p>
 
 <h1 align="center">AppWords</h1>
 
