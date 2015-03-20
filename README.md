@@ -10,14 +10,17 @@
 <a href="http://cocoadocs.org/docsets/AppWords"><img src="https://img.shields.io/cocoapods/p/AppWords.svg?style=flat" alt="Platform" />
 </p>
 
+
 ## SDK Components (included with this SDK):
 
 * AppWordsSDK.framework
+
 
 ## Integration Steps
 
 * Add the AppWordsSDK.framework file to your project (the *Copy items if needed* box needs to be checked).
 * Make sure you add AdSupport.framework to your Project Target’s *Linked Frameworks and Libraries* section in *General* (or to its *Link Binary with Libraries* section in *Build Phases*).
+
 
 ## Using the AppWords SDK in your app
 
@@ -39,9 +42,10 @@ Before retrieving deeplinks the SDK needs to scan your device for Deeplink AppWo
 * Note: `API_KEY` and `APP_ID` are not checked by this method – just cached for future use.
 * The SDK status can always be checked by way of the isInitialized property.
 
+
 #### 2. Getting a deeplink
 
-* Just call the getLinkWithKeywords:completion: method. Only one of error & deeplink will be non-nil on completion:
+* Just call the `getLinkWithKeywords:completion:` method. Only one of error & deeplink will be non-nil on completion:
 * The deeplink is a DLMELink object that encapsulates the following information:
   * title
   * text
@@ -59,15 +63,17 @@ Before retrieving deeplinks the SDK needs to scan your device for Deeplink AppWo
 		    }
 		}];
 
+
 #### 3. Handle your app being opened from a deeplink
 
 * Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](http://portal.deeplink.me/documentation/schemes-url-handling) for details.
-* For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:
+* For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
 
 		[AppWordsSDK handleOpenURL:url apiKey:@"API_key"];
 
 * The `API_KEY` is the unique developer ID, assigned to you on registering for a Deeplink account.
 * Note that the SDK need not be initialized before calling this method.
+
 
 ## FAQ
 
@@ -84,6 +90,7 @@ A: The SDK only returns deeplinks to installed apps and, even then, only to thos
 
 ##### Q: HELP!!! I am STILL not getting any deeplinks even when testing on a device!
 A: The SDK respects the *Limit Ad Targeting* setting on the device by not sending any data to Deeplink.me. This means that no deeplinks are currently sent to the device. Please ensure that *Limit Ad Targeting* is turned off on your test device.
+
 
 ## Please be in touch if you have any additional questions!  
 
