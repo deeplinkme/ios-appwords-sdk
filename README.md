@@ -1,24 +1,27 @@
-<p align="center"><img src="https://www.dropbox.com/s/1bbfjsxi4qilcec/deeplink-appwordsHIGHREZ.png?dl=0" width="204"/></p>
+<p align="center">![AppWords Logo](deeplink-appwords.png)</p>
 
 <h1 align="center">AppWords</h1>
 
 
 <p align="center">
-[![CI Status](http://img.shields.io/travis/Amit Attias/AppWords.svg?style=flat)](https://travis-ci.org/Amit Attias/AppWords)
-[![Version](https://img.shields.io/cocoapods/v/AppWords.svg?style=flat)](http://cocoadocs.org/docsets/AppWords)
-[![License](https://img.shields.io/cocoapods/l/AppWords.svg?style=flat)](http://cocoadocs.org/docsets/AppWords)
-[![Platform](https://img.shields.io/cocoapods/p/AppWords.svg?style=flat)](http://cocoadocs.org/docsets/AppWords)
+<a href="https://travis-ci.org/Amit Attias/AppWords"><img src="http://img.shields.io/travis/Amit Attias/AppWords.svg?style=flat" alt="CI Status" />
+<a href="http://cocoadocs.org/docsets/AppWords"><img src="https://img.shields.io/cocoapods/v/AppWords.svg?style=flat" alt="Version" />
+<a href="http://cocoadocs.org/docsets/AppWords"><img src="https://img.shields.io/cocoapods/l/AppWords.svg?style=flat" alt="License" />
+<a href="http://cocoadocs.org/docsets/AppWords"><img src="https://img.shields.io/cocoapods/p/AppWords.svg?style=flat" alt="Platform" />
 </p>
+<br>
 
 ## SDK Components (included with this SDK):
 
 * AppWordsSDK.framework
 
+<br>
 ## Integration Steps
 
 * Add the AppWordsSDK.framework file to your project (the *Copy items if needed* box needs to be checked).
 * Make sure you add AdSupport.framework to your Project Target’s *Linked Frameworks and Libraries* section in *General* (or to its *Link Binary with Libraries* section in *Build Phases*).
 
+<br>
 ## Using the AppWords SDK in your app
 
 #### 1. Initializing
@@ -39,9 +42,10 @@ Before retrieving deeplinks the SDK needs to scan your device for Deeplink AppWo
 * Note: `API_KEY` and `APP_ID` are not checked by this method – just cached for future use.
 * The SDK status can always be checked by way of the isInitialized property.
 
+<br>
 #### 2. Getting a deeplink
 
-* Just call the getLinkWithKeywords:completion: method. Only one of error & deeplink will be non-nil on completion:
+* Just call the `getLinkWithKeywords:completion:` method. Only one of error & deeplink will be non-nil on completion:
 * The deeplink is a DLMELink object that encapsulates the following information:
   * title
   * text
@@ -59,16 +63,18 @@ Before retrieving deeplinks the SDK needs to scan your device for Deeplink AppWo
 		    }
 		}];
 
+<br>
 #### 3. Handle your app being opened from a deeplink
 
 * Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](http://portal.deeplink.me/documentation/schemes-url-handling) for details.
-* For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:
+* For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
 
 		[AppWordsSDK handleOpenURL:url apiKey:@"API_key"];
 
 * The `API_KEY` is the unique developer ID, assigned to you on registering for a Deeplink account.
 * Note that the SDK need not be initialized before calling this method.
 
+<br>
 ## FAQ
 
 ##### Q: What errors are returned by the SDK?
@@ -85,10 +91,9 @@ A: The SDK only returns deeplinks to installed apps and, even then, only to thos
 ##### Q: HELP!!! I am STILL not getting any deeplinks even when testing on a device!
 A: The SDK respects the *Limit Ad Targeting* setting on the device by not sending any data to Deeplink.me. This means that no deeplinks are currently sent to the device. Please ensure that *Limit Ad Targeting* is turned off on your test device.
 
+<br>
 ## Please be in touch if you have any additional questions!  
 
-[itamar@deeplink.me](mailto:itamar@deeplink.me)
-
-[noah@deeplink.me](mailto:noah@deeplink.me)
-
+[itamar@deeplink.me](mailto:itamar@deeplink.me)<br>
+[noah@deeplink.me](mailto:noah@deeplink.me)<br>
 [hey@deeplink.me](mailto:hey@deeplink.me)
