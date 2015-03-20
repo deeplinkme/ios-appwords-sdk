@@ -1,5 +1,5 @@
 <p align="center">
-<img src="/deeplink-appwords.png" width="204"/>
+<img src="/deeplink-appwords.png" width="220"/>
 </p>
 
 <h1 align="center">AppWords</h1>
