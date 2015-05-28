@@ -15,87 +15,130 @@
 
 ## SDK Components (included with this SDK):
 
-* AppWordsSDK.framework
+* *AppWordsSDK.framework*
 
-<br>
+The *AppWordsSDKExample* app is also available from our *git* repository; feel free to use the source files as a basis for your own SDK integration.
+
 ## Integration Steps
 
-* Add the AppWordsSDK.framework file to your project (the *Copy items if needed* box needs to be checked).
-* Make sure you add AdSupport.framework to your Project Target’s *Linked Frameworks and Libraries* section in *General* (or to its *Link Binary with Libraries* section in *Build Phases*).
+* When installing via CocoaPods, just add this line to your Podfile:
 
-<br>
+        pod "AppWords"
+
+* When manually installing the framework:
+
+    * Add the *AppWordsSDK.framework* file to your project (the *Copy items if needed* box needs to be checked).
+
+    * Make sure you add *AdSupport.framework* and *SystemConfiguration.framework* to your Project Target’s *Linked Frameworks and Libraries* section in *General* (or to its *Link Binary with Libraries* section in *Build Phases*).
+
 ## Using the AppWords SDK in your app
 
-#### 1. Initializing
+### *0) Header file*
 
-* Add `#import <AppWordsSDK/AppWordsSDK.h>` to your App Delegate.
-Before retrieving deeplinks the SDK needs to scan your device for Deeplink AppWords apps
-* This happens off the main thread, and should consume negligible resources. You may wish call this method in your App Delegate’s application:didFinishLaunchingWithOptions: method.
+To access the SDK from your code, you will need to import the SDK header file:
 
-		[[AppWordsSDK sharedInstance] initializeWithApiKey:@"API_key"
-			andAppID:@"APP_ID"
-			completion:^(NSError *error) {
-				if (error == nil) {
-					NSLog(@"AppWords initialized");
-				}
-		}];
+    #import <AppWordsSDK/AppWordsSDK.h>
+
+### *1) Initializing*
+
+* Before retrieving deeplinks, the SDK needs to scan your device for Deeplink AppWords apps. This happens off the main thread, and should consume negligible resources. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method.
+
+        [[AppWordsSDK sharedInstance] initializeWithApiKey:@"API_KEY"
+                                                andAppID:@"APP_ID"
+                                                completion:^(NSError *error) {
+            if (error == nil) {
+                NSLog(@"AppWords initialized");
+            }
+            else {
+                NSLog(@"AppWords init failed: %@", [AppWordsSDK descriptionForError: error]);
+            }
+        }];
+
+* The completion handler will be called on the main thread.
 
 * The `API_KEY` is the unique developer ID, assigned to you on registering for a Deeplink account. The `APP_ID` is the unique app ID, assigned to the app on creating a new one.
+
 * Note: `API_KEY` and `APP_ID` are not checked by this method – just cached for future use.
+
 * The SDK status can always be checked by way of the isInitialized property.
 
-<br>
-#### 2. Getting a deeplink
+### *2) Getting a deeplink*
 
-* Just call the `getLinkWithKeywords:completion:` method. Only one of error & deeplink will be non-nil on completion:
-* The deeplink is a DLMELink object that encapsulates the following information:
-  * title
-  * text
-  * host
-* To follow the deeplink, call the method open:
+* Just call the `getLinkWithKeywords:completion:` method. Only one of `error` & `deeplink` will be non-`nil` on completion.
 
-		[[AppWordsSDK sharedInstance] getLinkWithKeywords:self.keywordsTextField.text
-		    completion:^(NSError *error, DLMELink *deeplink) {
-		    if (! error) {
-		        [deeplink open:(^(BOOL succeeded) {
-		            if (succeeded) {
-		                NSLog(@"Opened deeplink: %@", deeplink.title);
-		            }
-		        })];
-		    }
-		}];
+* The completion handler will be called on the main thread.
 
-<br>
-#### 3. Handle your app being opened from a deeplink
+* The `deeplink` is a `DLMELink` object that encapsulates the following information:
 
-* Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](http://portal.deeplink.me/documentation/schemes-url-handling) for details.
-* For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
+    * title
 
-		[AppWordsSDK handleOpenURL:url apiKey:@"API_key"];
+    * text
+
+    * host
+
+* To follow the `deeplink`, call the method `open:`
+
+        [[AppWordsSDK sharedInstance] getLinkWithKeywords:self.keywordsTextField.text
+                                               completion:^(NSError *error, DLMELink *deeplink) {
+            if (! error) {
+                [deeplink open:(^(BOOL succeeded) {
+                    if (succeeded) {
+                        NSLog(@"Opened deeplink: %@", deeplink.title);
+                    }
+                })];
+            }
+        }];
+
+### *3) Handle your app being opened from a deeplink*
+
+* Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](https://portal.deeplink.me/documentation/schemes-url-handling) for details.
+
+* For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in  `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
+
+        [AppWordsSDK handleOpenURL:url apiKey:@"API_KEY"];
 
 * The `API_KEY` is the unique developer ID, assigned to you on registering for a Deeplink account.
+
 * Note that the SDK need not be initialized before calling this method.
 
-<br>
 ## FAQ
 
-##### Q: What errors are returned by the SDK?
+**Q: What errors are returned by the SDK?**
 
-A: The SDK uses *NSError* instances to report errors. Every *NSError* instance returned by the SDK uses the private *DLMEErrorDomain* domain. The specific error is indicated by the *DLMEError* value, available via the code method; more detailed information is sometimes available via the *localizedDescription* method.
-Note that the SDK needs to communicate with the AppWords server to provide deeplinks. To prevent errors, you should ensure that the device is connected to the internet before calling the Deeplinkme SDK. 
+A: The SDK uses `NSError` instances to report errors. Every `NSError` instance returned by the SDK uses the private `DLMEErrorDomain` domain. The specific error is indicated by the `DLMEError` value, available via the `code` method; more detailed information is sometimes available via the `localizedDescription` method. You may use the SDK’s `descriptionForError:` class method to pretty-print this error.
 
-##### Q: I am not getting any deeplinks when testing in the simulator
+**Q: The SDK takes a long time to initialize; is something wrong?**
+
+A: Before retrieving deeplinks the SDK needs to scan your device for Deeplink AppWords apps. This can take time, especially since the SDK does this happens *off* the main thread at a low priority.
+
+It may also be the case that your device is not connected to the internet. The SDK handles this scenario intelligently by waiting until there is a connection, rather than immediately failing. You will see any connection errors logged in the XCode debug console.
+
+**Q: I am not getting any deeplinks when testing in the simulator**
+
 A: The SDK will link with your app for the simulator, but is hardwired to succeed initialization and fail to retrieve any deeplinks. However, the SDK *will* correctly strip AppWords tokens from a URL passed to `handleOpenURL:apiKey:`
 
-##### Q: I am not getting any deeplinks when testing on a device
+**Q:  I am not getting any deeplinks when testing on a device**
+
 A: The SDK only returns deeplinks to installed apps and, even then, only to those apps for which are in the AppWords network. A good app to install for testing purposes is TripAdvisor or, alternatively, Booking.com
 
-##### Q: HELP!!! I am STILL not getting any deeplinks even when testing on a device!
+Another way to test the connection to the server is using the *AppWordsSDKExample* app, available from our *git* repository:
+
+* Build and install the *AppWordsSDKExample* app on the device.
+
+* Call `getLinkWithKeywords:completion:` from your app, using **appwordssdkexample** (exactly as written, no spaces) as the `keywords` parameter. If the SDK can communicate with the server, then the server should return a `DLMELink` object.
+
+* Call `open` on the returned `DLMELink` object. This should launch the *AppWordsSDKExample* app.
+
+The *AppWordsSDKExample* app registers the Custom URL Scheme `AppWordsSDKExample` to enable this magic to happen.
+
+**Q:  HELP!!! I am STILL not getting any deeplinks even when testing on a device!**
+
 A: The SDK respects the *Limit Ad Targeting* setting on the device by not sending any data to Deeplink.me. This means that no deeplinks are currently sent to the device. Please ensure that *Limit Ad Targeting* is turned off on your test device.
 
-<br>
-## Please be in touch if you have any additional questions!  
+**Please be in touch if you have any additional questions!**
 
-[itamar@deeplink.me](mailto:itamar@deeplink.me)<br>
-[noah@deeplink.me](mailto:noah@deeplink.me)<br>
-[hey@deeplink.me](mailto:hey@deeplink.me)
+**[itamar@deeplink.me](mailto:itamar@deeplink.me)**
+
+**[noah@deeplink.me](mailto:noah@deeplink.me)**
+
+**[hey@deeplink.me](mailto:hey@deeplink.me)**

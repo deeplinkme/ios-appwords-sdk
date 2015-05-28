@@ -9,16 +9,16 @@
 #import <Foundation/Foundation.h>
 
     /**
-     * @p NSError domain for the Deeplinkme SDK.
+     * `NSError` domain for the Deeplinkme SDK.
      *
-     * @description All @p NSError instances returned from the SDK are in this domain.
+     * @description All `NSError` instances returned from the SDK are in this domain.
      */
 extern NSString *const DLMEErrorDomain;
 
     /**
-     * Deeplinkme @p NSError error codes.
+     * Deeplinkme `NSError` error codes.
      *
-     * @description All @p NSError instances returned from the SDK use codes from this enumeration.
+     * @description All `NSError` instances returned from the SDK use codes from this enumeration.
      */
 typedef enum : NSUInteger {
         /// No Error
@@ -43,7 +43,7 @@ typedef enum : NSUInteger {
 
     /**
      * A DLMELink encapsulates an AppWordsSDK deeplink.
-     * @discussion Returned in the completion handler of @p getLinkWithKeywords:completion:
+     * @discussion Returned in the completion handler of `getLinkWithKeywords:completion:`
      */
 @interface DLMELink : NSObject
 
@@ -58,6 +58,7 @@ typedef enum : NSUInteger {
      * Asynchronously open the deeplink in the target app.
      * @param completionHandler The block to be called on completion, successful or otherwise, of the method. Can be nil.
      * @discussion If successful, the user will now be in the target app.
+     * @note The completion block is always called on the main thread.
      */
 -(void)open:(void(^)(BOOL succeeded))completionHandler;
 
@@ -65,19 +66,19 @@ typedef enum : NSUInteger {
 
     /**
      * AppWordsSDK provides access to the Deeplinkme Marketplace.
-     * @discussion Use @p +sharedInstance to obtain the singleton.
+     * @discussion Use `+sharedInstance` to obtain the singleton.
      */
 @interface AppWordsSDK : NSObject
 
     /**
      * Handles tracking and stripping tracking information from incoming Marketplace deeplinks
      *
-     * @param url       The URL passed to the @p UIAppDelegate subclass, representing an incoming deeplink.
+     * @param url       The URL passed to the `UIAppDelegate` subclass, representing an incoming deeplink.
      * @param apiKey    The unique developer ID, assigned to you on registering for a Deeplinkme account.
      * @return The input URL stripped of any Marketplace tracking information, if any was found. Otherwise,
      * the original URL is returned.
-     * @discussion  When your app is opened through a deeplink, one of @p application:handleOpenURL: or the
-     * preferable @p application:openURL:sourceApplication:annotation: is called, passing in the deeplink
+     * @discussion  When your app is opened through a deeplink, one of `application:handleOpenURL:` or the
+     * preferable `application:openURL:sourceApplication:annotation:` is called, passing in the deeplink
      * as a URL.
      *
      * Before handling the URL, call this method to ensure accurate tracking of incoming deeplinks.
@@ -91,7 +92,15 @@ typedef enum : NSUInteger {
      */
 +(AppWordsSDK *)sharedInstance;
 
-    /// @p YES if AppWordsSDK initialization has completed successfully.
+    /**
+     * Returns the DLMEError description for an error.
+     *
+     * @param error     The error to pretty-print
+     * @return  The custom error description for an error in the `DLMEErrorDomain` error domain. Otherwise, the standard `NSError#description` is returned.
+     */
++(NSString *)descriptionForError:(NSError *)error;
+
+    /// `YES` if AppWordsSDK initialization has completed successfully.
 @property (nonatomic, readonly) BOOL isInitialized;
 
     /**
@@ -102,9 +111,10 @@ typedef enum : NSUInteger {
      * @param completion    The block to be called on initialization completion, successful or otherwise.
      * @discussion  Initialization involves scaning your device for installed Marketplace apps.
      *
-     * An @p NSError object describes the reason for failure, if any; a @nil error signifies success.
+     * An `NSError` object describes the reason for failure, if any; a nil error signifies success.
      *
-     * @warning Do not call @p getLinkWithKeywords:completion: before initialization is successfully completed.
+     * @note The completion block is always called on the main thread.
+     * @warning Do not call `getLinkWithKeywords:completion:` before initialization is successfully completed.
      */
 -(void)initializeWithApiKey:(NSString *)apiKey andAppID:(NSString *)appID completion:(void(^)(NSError *error))completionHandler;
 
@@ -115,7 +125,8 @@ typedef enum : NSUInteger {
      * @param completionHandler The block to be called on completion, successful or otherwise, of the method.
      * @discussion  If successful, the deeplink information is returned encapsulated in a DLMELink object.
      *
-     * Otherwise, an @p NSError object describes the reason for failure.
+     * Otherwise, an `NSError` object describes the reason for failure.
+     * @note The completion block is always called on the main thread.
      */
 -(void)getLinkWithKeywords:(NSString *)keywords completion:(void(^)(NSError *error, DLMELink *deeplink))completionHandler;
 
