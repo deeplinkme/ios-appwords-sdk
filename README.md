@@ -21,15 +21,15 @@ The *AppWordsSDKExample* app is also available from our *git* repository; feel f
 
 ## Integration Steps
 
-* When installing via CocoaPods, just add this line to your Podfile:
+When installing via CocoaPods, just add this line to your Podfile:
 
         pod "AppWords"
 
-* When manually installing the framework:
+When manually installing the framework:
 
-    * Add the *AppWordsSDK.framework* file to your project (the *Copy items if needed* box needs to be checked).
+* Add the *AppWordsSDK.framework* file to your project (the *Copy items if needed* box needs to be checked).
 
-    * Make sure you add *AdSupport.framework* and *SystemConfiguration.framework* to your Project Target’s *Linked Frameworks and Libraries* section in *General* (or to its *Link Binary with Libraries* section in *Build Phases*).
+* Make sure you add *AdSupport.framework* and *SystemConfiguration.framework* to your Project Target’s *Linked Frameworks and Libraries* section in *General* (or to its *Link Binary with Libraries* section in *Build Phases*).
 
 ## Using the AppWords SDK in your app
 
@@ -37,22 +37,28 @@ The *AppWordsSDKExample* app is also available from our *git* repository; feel f
 
 To access the SDK from your code, you will need to import the SDK header file:
 
-    #import <AppWordsSDK/AppWordsSDK.h>
+```objc
+#import <AppWordsSDK/AppWordsSDK.h>
+```
 
 ### *1) Initializing*
 
-* Before retrieving deeplinks, the SDK needs to scan your device for Deeplink AppWords apps. This happens off the main thread, and should consume negligible resources. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method.
+Before retrieving deeplinks, the SDK needs to scan your device for Deeplink AppWords apps. This happens off the main thread, and should consume negligible resources. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method.
 
-        [[AppWordsSDK sharedInstance] initializeWithApiKey:@"API_KEY"
-                                                andAppID:@"APP_ID"
-                                                completion:^(NSError *error) {
-            if (error == nil) {
-                NSLog(@"AppWords initialized");
-            }
-            else {
-                NSLog(@"AppWords init failed: %@", [AppWordsSDK descriptionForError: error]);
-            }
-        }];
+```objc
+[[AppWordsSDK sharedInstance] initializeWithApiKey:@"API_KEY"
+                                        andAppID:@"APP_ID"
+                                        completion:^(NSError *error) {
+    if (error == nil) {
+        NSLog(@"AppWords initialized");
+    }
+    else {
+        NSLog(@"AppWords init failed: %@", [AppWordsSDK descriptionForError: error]);
+    }
+}];
+```
+
+Notes:
 
 * The completion handler will be called on the main thread.
 
@@ -64,42 +70,93 @@ To access the SDK from your code, you will need to import the SDK header file:
 
 ### *2) Getting a deeplink*
 
-* Just call the `getLinkWithKeywords:completion:` method. Only one of `error` & `deeplink` will be non-`nil` on completion.
+Just call the `getLinkWithKeywords:completion:` method.
 
-* The completion handler will be called on the main thread.
+The completion handler will always be called on the main thread.
 
-* The `deeplink` is a `DLMELink` object that encapsulates the following information:
+The completion handler will receive `error` & `deeplink` parameters, only one of which will be non-`nil`.
+ 
+The `deeplink` is a `DLMELink` object that encapsulates information for displaying and following the link. To follow the `deeplink`, call the method `open:`
 
-    * title
-
-    * text
-
-    * host
-
-* To follow the `deeplink`, call the method `open:`
-
-        [[AppWordsSDK sharedInstance] getLinkWithKeywords:self.keywordsTextField.text
-                                               completion:^(NSError *error, DLMELink *deeplink) {
-            if (! error) {
-                [deeplink open:(^(BOOL succeeded) {
-                    if (succeeded) {
-                        NSLog(@"Opened deeplink: %@", deeplink.title);
-                    }
-                })];
+```objc
+[[AppWordsSDK sharedInstance] getLinkWithKeywords:self.keywordsTextField.text
+                                       completion:^(NSError *error, DLMELink *deeplink) {
+    if (! error) {
+        [deeplink open:(^(BOOL succeeded) {
+            if (succeeded) {
+                NSLog(@"Opened deeplink: %@", deeplink.title);
             }
-        }];
+        })];
+    }
+}];
+```
+
+#### Using the `keywords` parameter:
+
+The keywords parameter is a space-separated list of terms.
+
+Anything inside double quotation marks loses any special meaning, and is considered part of its surrounding term; the double quotation marks are then discarded.
+
+Each term can be a pure search string or a specialized search command.
+    
+Search strings can either be single words, or multi-word phrases (delimited by double quotation marks).
+    
+Search commands consist of command prefixes followed by the command parameter(s) (no space in between).
+Here is a brief summary of current prefixes, commands, and valid parameters:
+    
+| Prefixes | Command |
+| -------- | ------- |
+| **category:** | Category search  | 
+| **#**         | Category search  | 
+| **location:** | Location search  |
+| *@*  	        | Location search  |
+| **host:**     | Host search      |
+        
+Be sure to quote any `:`, `#`, `@` that is *not* part of a command prefix.
+
+##### **Category search:** 
+
+This restricts results to the category specified in the parameter. The parameter can be one of Apple's iTunes App Store categories, exactly as spelled by Apple including spaces.
+You will need to quote any parameter containing spaces.
+
+You may also use one of the following special categories:
+         
+| Parameter | Description | Example |
+| --------- | ----------- | ------- |
+| **product** | Buy a physical product  | `"cowboy hat" #product` *[purchase a cowboy hat]* |
+| **service** | Subscribe or pay for some service *or* non-physical product | `category:service shrimp "new york"` *[venues serving shrimp in New York]* |
+| **ticket**  | Purchase tickets to events/performances/movies  |  `circus category:ticket "Los Angeles"` *[circus tickets in LA]* |
+| **taxi**    | Hire a taxi | `#taxi` *[order a taxi]* |
+
+Put double quotation marks around any space-separated words you want to search for as a phrase;
+in fact, anything in between double quotation marks will be considered as a unit, and any other contained character will not be considered special.
+
+##### **Location search:**
+
+This restricts results to physical place situated within 1km of the coordinates specified in the parameter.
+The parameter must be of the form `latitude,longitude`, specified as signed, floating-point decimal numbers.
+
+e.g. `#service steakhouse @37.7952852,-122.4022904` *[steakhouse within 1 kilometre of the Transamerica Pyramid, San Francisco]*
+
+##### **Host search:**
+
+This restricts results to apps which correspond to a specific website domain. The parameter is a hostname (any `www.` prefix will be stripped off).
+
+e.g. `iPhone cases host:etsy.com` *[iPhone cases on Etsy]*
 
 ### *3) Handle your app being opened from a deeplink*
 
-* Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](https://portal.deeplink.me/documentation/schemes-url-handling) for details.
+Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](https://portal.deeplink.me/documentation/schemes-url-handling) for details.
 
-* For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in  `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
+For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in  `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
 
-        [AppWordsSDK handleOpenURL:url apiKey:@"API_KEY"];
+```objc
+[AppWordsSDK handleOpenURL:url apiKey:@"API_KEY"];
+```
 
-* The `API_KEY` is the unique developer ID, assigned to you on registering for a Deeplink account.
+The `API_KEY` is the unique developer ID, assigned to you on registering for a Deeplink account.
 
-* Note that the SDK need not be initialized before calling this method.
+Note that the SDK need not be initialized before calling this method.
 
 ## FAQ
 
