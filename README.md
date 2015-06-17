@@ -146,7 +146,7 @@ e.g. `iPhone cases host:etsy.com` *[iPhone cases on Etsy]*
 
 ### *3) Handle your app being opened from a deeplink*
 
-Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](https://portal.deeplink.me/documentation/schemes-url-handling) for details.
+Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](https://portal.deeplink.me/documentation#documentation-and-support-schemes-and-url-handling) for details.
 
 For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in  `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
 
