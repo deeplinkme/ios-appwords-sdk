@@ -6,6 +6,6 @@
 //  Copyright (c) 2015 Deeplink.me. All rights reserved.
 //
 
-#define API_KEY @"3CbEs42mYuoRvKfGc3VA"
-#define APP_ID @"519bd776f39af9b601000002"
+#define API_KEY @"tesBkZuyC5CxVe2yAhdF"
+#define APP_ID @"55c9bd013333370008010000"
 

@@ -47,5 +47,37 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+    <key>NSUserActivityTypes</key>
+    <array>
+        <string>demo.appwordssdkexample.pages</string>
+    </array>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>abcnewsiphone</string><!-- ABC News -->
+        <string>airbnb</string><!-- Airbnb -->
+        <string>birchbox</string><!-- Birchbox -->
+        <string>booking</string><!-- Booking.com -->
+        <string>sportscenter</string><!-- ESPN -->
+        <string>etsy</string><!-- Etsy -->
+        <string>expda</string><!-- Expedia -->
+        <string>foursquare</string><!-- Foursquare -->
+        <string>jackthreads</string><!-- JackThreads -->
+        <string>ls</string><!-- LivingSocial -->
+        <string>reservetable-com.contextoptional.OpenTable-1</string><!-- OpenTable -->
+        <string>pandora</string><!-- Pandora -->
+        <string>pinterest</string><!-- Pinterest -->
+        <string>poshmark</string><!-- Poshmark -->
+        <string>shazam</string><!-- Shazam -->
+        <string>soundcloud</string><!-- SoundCloud -->
+        <string>stubhub</string><!-- StubHub -->
+        <string>com.aol.mobile.techcrunch</string><!-- TechCrunch -->
+        <string>threadflip</string><!-- Threadflip -->
+        <string>todaytix</string><!-- TodayTix -->
+        <string>tripadvisor</string><!-- TripAdvisor -->
+        <string>urbanout</string><!-- UrbanOutfitters.com -->
+        <string>yelp</string><!-- Yelp -->
+        <string>com.yummly.production</string><!-- Yummly -->
+        <string>zomato</string><!-- Zomato -->
+    </array>
 </dict>
 </plist>

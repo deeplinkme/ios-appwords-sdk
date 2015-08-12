@@ -11,11 +11,17 @@
 
 #import "ApiConstants.h"
 
-@interface ViewController () <UITextViewDelegate>
+#ifdef __IPHONE_9_0
+#import <CoreSpotlight/CoreSpotlight.h>
+#import <MobileCoreServices/UTCoreTypes.h>
+#endif
 
-@property (strong, nonatomic) IBOutlet UIButton *linkButton;
-@property (strong, nonatomic) IBOutlet UITextField *keywordsTextField;
-@property (strong, nonatomic) IBOutlet UIButton *createButton;
+@interface ViewController ()
+
+@property (weak, nonatomic) IBOutlet UIButton *gotoSearchWordsButton;
+@property (weak, nonatomic) IBOutlet UIButton *linkButton;
+@property (weak, nonatomic) IBOutlet UITextField *keywordsTextField;
+@property (weak, nonatomic) IBOutlet UIButton *createButton;
 @property (weak, nonatomic) IBOutlet UILabel *errorCode;
 @property (weak, nonatomic) IBOutlet UITextView *errorMessage;
 
@@ -45,16 +51,43 @@
             else {
                 self.errorCode.text = @"<None>";
                 self.errorMessage.text = @"initializeWithApiKey succeeded";
-
+                
                 self.createButton.enabled = YES;
             }
         });
     }];
+    self.createButton.enabled = YES;
+#ifndef __IPHONE_9_0
+    self.gotoSearchWordsButton.enabled = NO;
+#endif
 }
+
+- (IBAction)unwindToThisViewController:(UIStoryboardSegue *)unwindSegue
+{
+}
+
+-(void)restoreUserActivityState:(NSUserActivity *)activity {
+    UIViewController *presentedViewController = [self presentedViewController];
+    if (presentedViewController) {
+        [presentedViewController restoreUserActivityState:activity];
+    }
+    else {
+        [self performSegueWithIdentifier:@"SearchWordsSegue" sender:activity];
+        [super restoreUserActivityState:activity];
+    }
+}
+
+-(void)prepareForSegue:(nonnull UIStoryboardSegue *)segue sender:(id)sender {
+    if ([sender isKindOfClass:[NSUserActivity class]])
+    {
+        [[segue destinationViewController] restoreUserActivityState:sender];
+    }
+}
+
 - (IBAction)createButtonClicked:(id)sender {
     
     [self.keywordsTextField resignFirstResponder];
-
+    
     self.errorCode.text = @"";
     self.errorMessage.text = @"";
     [[AppWordsSDK sharedInstance] getLinkWithKeywords:self.keywordsTextField.text completion:^(NSError *error, DLMELink *deeplink) {
@@ -66,11 +99,12 @@
         else {
             self.errorCode.text = @"<None>";
             self.errorMessage.text = @"getLinkWithKeywords succeeded";
-
+            
             [self.linkButton setTitle:deeplink.host forState:UIControlStateNormal];
         }
     }];
 }
+
 - (IBAction)linkButtonClicked:(id)sender {
     [self.deeplink open:nil];
 }

@@ -10,6 +10,12 @@
 #import <AppWordsSDK/AppWordsSDK.h>
 
 #import "ApiConstants.h"
+#import "SearchViewController.h"
+
+#ifdef __IPHONE_9_0
+#import <CoreSpotlight/CoreSpotlight.h>
+#import <MobileCoreServices/UTCoreTypes.h>
+#endif
 
 @interface AppDelegate ()
 
@@ -48,5 +54,31 @@
 -(BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
     url = [AppWordsSDK handleOpenURL:url apiKey:API_KEY];
     return YES;
+}
+
+- (BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void(^)(NSArray *restorableObjects))restorationHandler {
+    
+    NSString *activityType = userActivity.activityType;
+    if ([activityType isEqualToString:kDemoActivityType]) {
+        // Handle restoration for values provided in userInfo
+        if (self.window != nil) {
+            [self.window.rootViewController restoreUserActivityState:userActivity];
+        }
+        return YES;
+    }
+#ifdef __IPHONE_9_0
+    else if ([activityType isEqualToString:CSSearchableItemActionType]) {
+        // This activity represents an item indexed using Core Spotlight, so restore the context related to the unique identifier.
+//        // The unique identifier of the Core Spotlight item is set in the activity’s userInfo for the key CSSearchableItemActivityIdentifier.
+//        NSString *uniqueIdentifier = [userActivity.userInfo objectForKey:CSSearchableItemActivityIdentifier];
+        
+        if (self.window != nil) {
+            [self.window.rootViewController restoreUserActivityState:userActivity];
+        }
+        
+        return YES;
+    }
+#endif
+    return NO;
 }
 @end
