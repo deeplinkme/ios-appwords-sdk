@@ -214,7 +214,6 @@ Here is the list of attributes in `CSSearchableItemAttributeSet` that will be in
 * `contentDescription`: **(required)** description/summary of the page.
 * `displayName`: name of the page, suitable to display in the user interface
 * `latitude`, `longitude`: any relevant physical coordinates, e.g. physical location of a restaurant represented by the page
-* : (see longitude)
 * `contentType`: uniform type identifier (see Apple [documentation](https://developer.apple.com/library/ios/documentation/General/Conceptual/DevPedia-CocoaCore/UniformTypeIdentifier.html))
 * `contentTypeTree`: custom hierarchy of uniform type identifiers (see Apple [documentation](https://developer.apple.com/library/ios/documentation/General/Conceptual/DevPedia-CocoaCore/UniformTypeIdentifier.html))
 * `relatedUniqueIdentifier`: this should be identical to the
