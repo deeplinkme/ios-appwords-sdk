@@ -45,11 +45,14 @@ typedef enum : NSUInteger {
     DLMEErrorNotSupported,
         /// The SDK is not ready to handle the request.
     DLMEErrorNotReady,
+        /// The connection timed out while waiting for the SDK to handle a request.
+    DLMEErrorTimedOut,
 } DLMEError;
 
     /**
      * A DLMELink encapsulates an AppWordsSDK deeplink.
      * @discussion Returned in the completion handler of `getLinkWithKeywords:completion:`
+     * @note None of the properties are ever nil
      */
 @interface DLMELink : NSObject
 
@@ -59,6 +62,12 @@ typedef enum : NSUInteger {
 @property (nonatomic, readonly) NSString *text;
     /// url host of a page in a AppWords app’s website.
 @property (nonatomic, readonly) NSString *host;
+    /// url for the featured image
+@property (nonatomic, readonly) NSString *image;
+    /// url for the app icon
+@property (nonatomic, readonly) NSString *app_icon;
+    /// categories associated with the link contents
+@property (nonatomic, readonly) NSArray *categories;
 
     /**
      * Asynchronously open the deeplink in the target app.
@@ -79,6 +88,42 @@ typedef enum : NSUInteger {
 @interface AppWordsSDK : NSObject
 
     /**
+     * Returns the AppWordsSDK singleton.
+     */
++(AppWordsSDK *)sharedInstance;
+
+    /**
+     * Returns the DLMEError description for an error.
+     *
+     * @param error     The error to pretty-print
+     * @return  The custom error description for an error in the `DLMEErrorDomain` error domain. Otherwise, the standard `NSError#description` is returned.
+     */
++(NSString *)descriptionForError:(NSError *)error;
+
+    /// `YES` if AppWordsSDK initialization has completed successfully.
+@property (nonatomic, readonly) BOOL isInitialized;
+
+
+    /**
+     * Retrieve any deeplink associated with a fresh app installation from the AppWords server.
+     *
+     * @param launchOptions     The options passed to `-application:willFinishLaunchingWithOptions:` and the like in the `UIAppDelegate` subclass; the SDK will not check the server if this is non-nil.
+     * @param appID         The unique app ID, assigned to the app by Deeplinkme on creation in the portal.
+     * @param timeout       The interval, in seconds, for the connection to wait before canceling the server request and calling the completion handler with a timeout error.
+     * @param completion    The block to be called after an asynchrononous server check is completed.
+     * @return `YES` if the SDK is asychnonously attempting an installation deeplink; otherwise `NO`.
+     * @discussion  If the server found an installation-associated deeplink, then its url is returned in the completion handler; otherwise nil is returned (this is not considered an error).
+     *
+     * An `NSError` object describes the reason for failure, if any; a `nil` error signifies success.
+     *
+     * @note This method is safe to call on every launch, as it does nothing except on it's first call after a fresh install.
+     * @note The completion block is called if, and only if, the method returned YES
+     * @note The completion block is always called on the main thread.
+     * @note You might want to prevent state restoration if the method returns YES at least until the completion block has had the chance to return a launch URL.
+     */
++(BOOL)getAssociatedInstallationLinkWithOptions:(NSDictionary *)launchOptions appID:(NSString *)appID timeout:(NSTimeInterval)timeout completion:(void(^)(NSURL *url, NSError *error))completionHandler;
+
+    /**
      * Handles tracking and stripping tracking information from incoming AppWords deeplinks
      *
      * @param url       The URL passed to the `UIAppDelegate` subclass, representing an incoming deeplink.
@@ -94,22 +139,6 @@ typedef enum : NSUInteger {
      * Replace the original URL with the return value for a clean URL stripped of AppWords tracking information.
      */
 +(NSURL *)handleOpenURL:(NSURL *)url apiKey:(NSString *)apiKey;
-
-    /**
-     * Returns the AppWordsSDK singleton.
-     */
-+(AppWordsSDK *)sharedInstance;
-
-    /**
-     * Returns the DLMEError description for an error.
-     *
-     * @param error     The error to pretty-print
-     * @return  The custom error description for an error in the `DLMEErrorDomain` error domain. Otherwise, the standard `NSError#description` is returned.
-     */
-+(NSString *)descriptionForError:(NSError *)error;
-
-    /// `YES` if AppWordsSDK initialization has completed successfully.
-@property (nonatomic, readonly) BOOL isInitialized;
 
     /**
      * Initializes the AppWordsSDK singleton.
@@ -150,16 +179,13 @@ typedef enum : NSUInteger {
      * and `imageURL` arguments. See full documentation for details.
      *
      * If successful, `error` is nil. Otherwise, the `NSError` object describes the reason for failure.
+     *
      * @note The `webpageURL` is used as a unique identifier, don't use a generic front page for all search items. It must also belong to your host, as declared on the portal.
      * @note The completion block is always called on the main thread.
      * @warning Any contained data might be revealed to other users, so please do not include private user data.
 
      */
--(void)addPublicallySearchableItem:(CSSearchableItem *)item
-                        webpageURL:(NSString *)webpageURL
-                          keywords:(NSSet *)keywords
-                          imageURL:(NSString *)imageURL
-                        completion:(void(^)(NSError *error))completionHandler;
+-(void)addPublicallySearchableItem:(CSSearchableItem *)item webpageURL:(NSString *)webpageURL keywords:(NSSet *)keywords imageURL:(NSString *)imageURL completion:(void(^)(NSError *error))completionHandler;
 
     /**
      * Asynchronously send structured search data, encapsulated in an `NSUserActivity`, to the AppWords server for indexing.

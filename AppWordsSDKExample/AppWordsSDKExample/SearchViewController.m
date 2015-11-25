@@ -16,6 +16,10 @@
 
 NSString *kDemoActivityType = @"demo.appwordssdkexample.pages";
 
+static NSString *trimmedStringFromString(NSString *string) {
+    return [string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+}
+
 @interface SearchViewController () <UITextFieldDelegate>
 
 @property (strong, nonatomic) IBOutlet UITextField *titleTextField;
@@ -103,29 +107,29 @@ NSString *kDemoActivityType = @"demo.appwordssdkexample.pages";
     
 #ifdef __IPHONE_9_0
     if ([CSSearchableItemAttributeSet class]) {
+        NSUserActivity *activity = [[NSUserActivity alloc] initWithActivityType:kDemoActivityType]; // use your own!
+        activity.requiredUserInfoKeys = [NSSet setWithArray:@[@"title", @"description", @"keywords"]];
+
         CSSearchableItemAttributeSet *contentAttributeSet = self.attributeSet;
-        contentAttributeSet.relatedUniqueIdentifier = self.webpageURL;
+        // Don't do this unless you have also indexed the corresponding CSSearchableItem
+        // contentAttributeSet.relatedUniqueIdentifier = self.webpageURL;
+        activity.contentAttributeSet = contentAttributeSet;
 
-        [self.userActivity resignCurrent];
-        self.userActivity = nil;
+        activity.expirationDate = [NSDate dateWithTimeIntervalSinceNow:24*60*60]; // use a more appropriate date for your own pages!
+        activity.webpageURL = [NSURL URLWithString:[self webpageURL]];
+        activity.keywords = [self keywords];
+        activity.title = [self title];
+
+        activity.eligibleForHandoff = YES;
+        activity.eligibleForSearch = YES;
+        activity.eligibleForPublicIndexing = YES;
+
+        [self updateUserActivityState:activity];
+
+        self.userActivity = activity;
         
-        self.userActivity = [[NSUserActivity alloc] initWithActivityType:kDemoActivityType]; // use your own!
-        self.userActivity.requiredUserInfoKeys = [NSSet setWithArray:@[@"title", @"description", @"keywords"]];
-
-        self.userActivity.contentAttributeSet = contentAttributeSet;
-
-        self.userActivity.expirationDate = [NSDate dateWithTimeIntervalSinceNow:24*60*60]; // use a more appropriate date for your own pages!
-        self.userActivity.webpageURL = [NSURL URLWithString:[self webpageURL]];
-        self.userActivity.keywords = [self keywords];
-        self.userActivity.title = [self title];
-
-        self.userActivity.eligibleForHandoff = YES;
-        self.userActivity.eligibleForSearch = YES;
-        self.userActivity.eligibleForPublicIndexing = YES;
-
-        self.userActivity.needsSave = YES;
-
-        [self.userActivity becomeCurrent]; // Apple will index this activity, if not previously indexed; otherwise it will increase its search rank
+        // Register the activity for Spotlight searching
+        [self.userActivity becomeCurrent];
 
         // Send the activity to AppWords for indexing
         [[AppWordsSDK sharedInstance] addUserActivity:self.userActivity imageURL:[self imageURL] completion:^(NSError *error)
@@ -139,12 +143,14 @@ NSString *kDemoActivityType = @"demo.appwordssdkexample.pages";
 
 - (void)restoreTextFieldsFromActivity:(NSUserActivity *)activity {
 #ifdef __IPHONE_9_0
-    self.userActivity.requiredUserInfoKeys = [NSSet setWithArray:@[@"title", @"description", @"keywords"]];
+    if ([activity respondsToSelector:@selector(requiredUserInfoKeys)]) {
+        self.userActivity.requiredUserInfoKeys = [NSSet setWithArray:@[@"title", @"description", @"keywords"]];
+    }
 #endif
 
-    self.titleTextField.text = self.userActivity.userInfo[@"title"];
-    self.descriptionTextField.text = self.userActivity.userInfo[@"description"];
-    self.keywordsTextField.text = self.userActivity.userInfo[@"keywords"];
+    self.titleTextField.text = activity.userInfo[@"title"];
+    self.descriptionTextField.text = activity.userInfo[@"description"];
+    self.keywordsTextField.text = activity.userInfo[@"keywords"];
 }
 
 - (void)restoreUserActivityState:(NSUserActivity *)activity {
@@ -153,14 +159,12 @@ NSString *kDemoActivityType = @"demo.appwordssdkexample.pages";
     if ([self isViewLoaded]) {
         [self restoreTextFieldsFromActivity:activity];
     }
-    
-    [super restoreUserActivityState:activity];
 }
 
 - (void)updateUserActivityState:(nonnull NSUserActivity *)activity {
-    self.userActivity.userInfo = @{@"title": self.titleTextField.text,
-                                   @"description": self.descriptionTextField.text,
-                                   @"keywords": self.keywordsTextField.text};
+    [activity addUserInfoEntriesFromDictionary:@{@"title": self.titleTextField.text,
+                                                 @"description": self.descriptionTextField.text,
+                                                 @"keywords": self.keywordsTextField.text}];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -172,12 +176,12 @@ NSString *kDemoActivityType = @"demo.appwordssdkexample.pages";
 
 // You will want to choose a real description/summary of your app page!
 - (NSString *)title {
-    return self.titleTextField.text;
+    return trimmedStringFromString(self.titleTextField.text);
 }
 
 // You will want to return a real webpage corresponding to the app page!
 - (NSString *)webpageURL {
-    NSString *base64 = [[self.titleTextField.text dataUsingEncoding:NSASCIIStringEncoding] base64EncodedStringWithOptions:0];
+    NSString *base64 = [[trimmedStringFromString(self.titleTextField.text) dataUsingEncoding:NSASCIIStringEncoding] base64EncodedStringWithOptions:0];
     NSString *safeBase64 = [base64 stringByReplacingOccurrencesOfString:@"/" withString:@"_"];
     return [NSString stringWithFormat:@"http://appwordssdkexample.demo/%@", safeBase64];
 }
@@ -203,7 +207,7 @@ NSString *kDemoActivityType = @"demo.appwordssdkexample.pages";
 
 // You will want to choose a real description/summary of your app page!
 - (NSString *)contentDescription {
-    return self.descriptionTextField.text;
+    return trimmedStringFromString(self.descriptionTextField.text);
 }
 
 #ifdef __IPHONE_9_0
@@ -214,10 +218,11 @@ NSString *kDemoActivityType = @"demo.appwordssdkexample.pages";
     
     attributeSet.title = self.title;
     attributeSet.contentDescription = self.contentDescription;
+    attributeSet.keywords = [self.keywords allObjects];
     
     // Dummy coordinates: use real ones!
-    attributeSet.latitude = @-74.0132826;
-    attributeSet.longitude = @40.7114927;
+    attributeSet.longitude = @-74.0132826;
+    attributeSet.latitude = @40.7114927;
 
     return attributeSet;
 }

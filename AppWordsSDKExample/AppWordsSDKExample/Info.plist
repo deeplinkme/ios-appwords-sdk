@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
-	<string>Deeplink.$(PRODUCT_NAME:rfc1034identifier)</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
@@ -31,8 +31,47 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>abcnewsiphone</string>
+		<string>airbnb</string>
+		<string>birchbox</string>
+		<string>booking</string>
+		<string>sportscenter</string>
+		<string>etsy</string>
+		<string>expda</string>
+		<string>foursquare</string>
+		<string>jackthreads</string>
+		<string>ls</string>
+		<string>reservetable-com.contextoptional.OpenTable-1</string>
+		<string>pandora</string>
+		<string>pinterest</string>
+		<string>poshmark</string>
+		<string>shazam</string>
+		<string>soundcloud</string>
+		<string>stubhub</string>
+		<string>com.aol.mobile.techcrunch</string>
+		<string>threadflip</string>
+		<string>todaytix</string>
+		<string>tripadvisor</string>
+		<string>urbanout</string>
+		<string>yelp</string>
+		<string>com.yummly.production</string>
+		<string>zomato</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>&quot;test&quot;</string>
+	<key>NSUserActivityTypes</key>
+	<array>
+		<string>demo.appwordssdkexample.pages</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -47,37 +86,5 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-    <key>NSUserActivityTypes</key>
-    <array>
-        <string>demo.appwordssdkexample.pages</string>
-    </array>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>abcnewsiphone</string><!-- ABC News -->
-        <string>airbnb</string><!-- Airbnb -->
-        <string>birchbox</string><!-- Birchbox -->
-        <string>booking</string><!-- Booking.com -->
-        <string>sportscenter</string><!-- ESPN -->
-        <string>etsy</string><!-- Etsy -->
-        <string>expda</string><!-- Expedia -->
-        <string>foursquare</string><!-- Foursquare -->
-        <string>jackthreads</string><!-- JackThreads -->
-        <string>ls</string><!-- LivingSocial -->
-        <string>reservetable-com.contextoptional.OpenTable-1</string><!-- OpenTable -->
-        <string>pandora</string><!-- Pandora -->
-        <string>pinterest</string><!-- Pinterest -->
-        <string>poshmark</string><!-- Poshmark -->
-        <string>shazam</string><!-- Shazam -->
-        <string>soundcloud</string><!-- SoundCloud -->
-        <string>stubhub</string><!-- StubHub -->
-        <string>com.aol.mobile.techcrunch</string><!-- TechCrunch -->
-        <string>threadflip</string><!-- Threadflip -->
-        <string>todaytix</string><!-- TodayTix -->
-        <string>tripadvisor</string><!-- TripAdvisor -->
-        <string>urbanout</string><!-- UrbanOutfitters.com -->
-        <string>yelp</string><!-- Yelp -->
-        <string>com.yummly.production</string><!-- Yummly -->
-        <string>zomato</string><!-- Zomato -->
-    </array>
 </dict>
 </plist>

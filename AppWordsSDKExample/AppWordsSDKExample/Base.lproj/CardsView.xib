@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view opaque="NO" contentMode="center" id="xZ7-JC-28k" customClass="CardsView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="redraw" directionalLockEnabled="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="f4C-6w-M7c">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <animations/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="wHA-aJ-8ET">
+                        <size key="itemSize" width="600" height="200"/>
+                        <size key="headerReferenceSize" width="0.0" height="36"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="11" maxX="0.0" maxY="0.0"/>
+                    </collectionViewFlowLayout>
+                    <cells/>
+                    <connections>
+                        <outlet property="dataSource" destination="xZ7-JC-28k" id="4D2-l8-0yE"/>
+                        <outlet property="delegate" destination="xZ7-JC-28k" id="3pg-cz-MoB"/>
+                    </connections>
+                </collectionView>
+            </subviews>
+            <animations/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="f4C-6w-M7c" secondAttribute="bottom" id="WBJ-Mq-4hc"/>
+                <constraint firstItem="f4C-6w-M7c" firstAttribute="leading" secondItem="xZ7-JC-28k" secondAttribute="leading" id="YDi-E9-4lW"/>
+                <constraint firstItem="f4C-6w-M7c" firstAttribute="top" secondItem="xZ7-JC-28k" secondAttribute="top" id="pXL-y3-2IA"/>
+                <constraint firstAttribute="trailing" secondItem="f4C-6w-M7c" secondAttribute="trailing" id="zTZ-dP-dPL"/>
+            </constraints>
+            <connections>
+                <outlet property="collectionView" destination="f4C-6w-M7c" id="Ngb-XN-6a0"/>
+            </connections>
+        </view>
+    </objects>
+</document>

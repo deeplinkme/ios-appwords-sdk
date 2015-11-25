@@ -9,7 +9,7 @@
 
 Pod::Spec.new do |s|
   s.name             = "AppWords"
-  s.version          = "0.5.0"
+  s.version          = "0.6.0"
   s.summary          = "Deeplink AppWords SDK"
   s.description      = <<-DESC
                        Deeplink AppWords SDK for searching & hosting deep links in your app. The AppWords SDK will help your app figure out what other apps are on your user's phone, and serves deep links at a defined exit point. Link to the next action, and acquire and drive intent based traffic back into your app.
@@ -23,8 +23,9 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.social_media_url = 'https://twitter.com/deeplinkme'
 
-  s.public_header_files =  "**/*.h"
+  s.public_header_files =  "AppWordsSDK.framework/**/*.h"
   s.frameworks = 'AdSupport', 'SystemConfiguration','CoreSpotlight'
   s.vendored_frameworks = ['AppWordsSDK.framework', 'CoreSpotlight.framework']
+  s.resource_bundle = {'DLME_UI' => '**/DLME_UI.bundle/*'}
 end
 

@@ -18,7 +18,8 @@
 #endif
 
 @interface AppDelegate ()
-
+@property (nonatomic) BOOL justLaunched;
+@property (nonatomic) BOOL waitingForInstallationLink;
 @end
 
 @implementation AppDelegate
@@ -26,6 +27,17 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    self.justLaunched = YES;
+    self.waitingForInstallationLink = [AppWordsSDK getAssociatedInstallationLinkWithOptions:launchOptions appID:APP_ID timeout:1.0 completion:^(NSURL *url, NSError *error) {
+        if (url != nil) {
+            [self.window.rootViewController performSegueWithIdentifier:@"DeeplinkSegue" sender:url];
+        }
+        else {
+            [self.window.rootViewController performSegueWithIdentifier:@"AppWordsSegue" sender:nil];
+        }
+    }];
+    
+//    [self.window.rootViewController performSegueWithIdentifier:@"WelcomeSegue" sender:nil];
     return YES;
 }
 
@@ -45,6 +57,12 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+    if (self.justLaunched) {
+        self.justLaunched = NO;
+        if (! self.waitingForInstallationLink) {
+            [self.window.rootViewController performSegueWithIdentifier:@"AppWordsSegue" sender:nil];
+        }
+    }
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -67,7 +85,8 @@
         return YES;
     }
 #ifdef __IPHONE_9_0
-    else if ([activityType isEqualToString:CSSearchableItemActionType]) {
+    else if (&CSSearchableItemActionType != NULL && //iOS 9+
+             [activityType isEqualToString:CSSearchableItemActionType]) {
         // This activity represents an item indexed using Core Spotlight, so restore the context related to the unique identifier.
 //        // The unique identifier of the Core Spotlight item is set in the activity’s userInfo for the key CSSearchableItemActivityIdentifier.
 //        NSString *uniqueIdentifier = [userActivity.userInfo objectForKey:CSSearchableItemActivityIdentifier];

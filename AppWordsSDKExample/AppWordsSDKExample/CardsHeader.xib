@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9060" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9051"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="CardsHeader" id="ldP-th-0rC">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OEb-gy-NoM" userLabel="title" customClass="UICollectionReusableView">
+                    <rect key="frame" x="5" y="0.0" width="310" height="50"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Suggestions near you" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xw2-TV-Wim">
+                            <rect key="frame" x="49" y="7" width="250" height="35"/>
+                            <animations/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="35" id="OM7-My-tPk"/>
+                                <constraint firstAttribute="width" constant="250" id="tLT-bM-CfN"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="12"/>
+                            <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="deeplink_icon_light.png" translatesAutoresizingMaskIntoConstraints="NO" id="Lds-gF-eO9">
+                            <rect key="frame" x="20" y="19" width="12" height="12"/>
+                            <animations/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="12" id="Zhd-Ib-6oF"/>
+                                <constraint firstAttribute="width" constant="12" id="lZD-TY-9dy"/>
+                            </constraints>
+                        </imageView>
+                    </subviews>
+                    <animations/>
+                    <color key="backgroundColor" red="0.29411764709999999" green="0.66666666669999997" blue="0.82745098039999998" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstItem="Lds-gF-eO9" firstAttribute="leading" secondItem="OEb-gy-NoM" secondAttribute="leading" constant="20" id="3EY-Tc-Wuk"/>
+                        <constraint firstItem="Lds-gF-eO9" firstAttribute="centerY" secondItem="OEb-gy-NoM" secondAttribute="centerY" id="Zvw-xL-asg"/>
+                        <constraint firstItem="xw2-TV-Wim" firstAttribute="centerY" secondItem="Lds-gF-eO9" secondAttribute="centerY" id="hic-Pe-Vnj"/>
+                        <constraint firstItem="xw2-TV-Wim" firstAttribute="leading" secondItem="Lds-gF-eO9" secondAttribute="trailing" constant="17" id="wb2-oF-397"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <animations/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="OEb-gy-NoM" secondAttribute="trailing" constant="5" id="034-7Q-dsp"/>
+                <constraint firstItem="OEb-gy-NoM" firstAttribute="top" secondItem="ldP-th-0rC" secondAttribute="top" id="6K4-Yi-PlB"/>
+                <constraint firstAttribute="bottom" secondItem="OEb-gy-NoM" secondAttribute="bottom" id="fDD-Y0-5rJ"/>
+                <constraint firstItem="OEb-gy-NoM" firstAttribute="leading" secondItem="ldP-th-0rC" secondAttribute="leading" constant="5" id="hhP-6d-CDb"/>
+            </constraints>
+        </collectionReusableView>
+    </objects>
+    <resources>
+        <image name="deeplink_icon_light.png" width="12" height="12"/>
+    </resources>
+</document>

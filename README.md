@@ -6,9 +6,11 @@
 
 <br>
 
-Acquire and drive intent based traffic into your app, find great deep links to extend your app features.
+* [Follow through deep links that result in your app being installed (Installation Tracking)](#retrieving-a-launch-url-associated-with-an-installation)
 
-**!! NEW for iOS 9 !!** Index your *iOS Search API* pages with AppWords, as well as with Apple.
+* [Acquire and drive intent based traffic into your app, find great deep links to extend your app features.](#becoming-part-of-the-appwords-network-of-apps)
+
+* [Index your *iOS Search API* pages with AppWords, as well as with Apple.](#adding-pages-to-the-appwords-index)
 
 ## SDK Components (included with this SDK):
 
@@ -25,9 +27,9 @@ The *AppWordsSDKExample* app is also available from our CocoaPods *git* reposito
 
         pod "AppWords"
 
-##### N.B. To build using *Xcode 7*, you will need to *delete* our dummy *CoreSpotlight.framework*. This is located (once the pod has been installed) in the *Xcode Project Manager* under the *Pods* project in *Pods»AppWords»Frameworks*
+##### N.B. To build using *Xcode 7*, you will need to *delete* our dummy *CoreSpotlight.framework*. This is located (once the pod has been installed) in the *Xcode Project Manager* under the *Pods* project in *Pods»AppWords»Frameworks*. Choose *Move to Trash* when prompted; *Remove Reference* is not enough.
 
-### *Manually install*
+### *Manual install*
 
 * Add the *AppWordsSDK.framework* file to your project (the *Copy items if needed* box needs to be checked).
 
@@ -37,17 +39,15 @@ The *AppWordsSDKExample* app is also available from our CocoaPods *git* reposito
 
 ## Using the AppWords SDK in your app
 
-### *0) Header file*
-
 To access the SDK from your code, you will need to import the SDK header file:
 
 ```objc
 #import <AppWordsSDK/AppWordsSDK.h>
 ```
 
-### *1) Initializing*
+### *Initializing*
 
-Before retrieving deeplinks, the SDK needs to scan your device for deeplinkable AppWords apps. This happens off the main thread, and should consume negligible resources. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method.
+Before retrieving deep links or indexing pages, the SDK needs to scan your device for deep-linkable AppWords apps. This happens off the main thread, and should consume negligible resources. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method.
 
 ```objc
 [[AppWordsSDK sharedInstance] initializeWithApiKey:@"API_KEY"
@@ -72,10 +72,7 @@ Notes:
 
 * The SDK status can always be checked by way of the `isInitialized` property.
 
-* **In iOS 9, scanning for apps is restricted to those apps whose scheme is
-  declared in your Info.plist file.  To get deeplinks in iOS 9, it is
-  essential that you copy the list below and paste it into Info.plist, just
-  above the terminating `</dict></plist>`. (You may delete entries for apps that you don't wish to deeplink into.)**
+* **In iOS 9, scanning for apps is restricted to those apps whose scheme is declared in your Info.plist file.  To get deep links in iOS 9, it is essential that you copy the list below and paste it into Info.plist, just above the terminating `</dict></plist>`. (You may delete entries for apps that you don't wish to deep link into.)**
 
 ```xml
     <key>LSApplicationQueriesSchemes</key>
@@ -110,7 +107,48 @@ Notes:
 
 
 
-### *2) Getting a deeplink*
+
+## Retrieving a launch URL associated with an installation
+
+A deep link can fail to open your app because the app itself is not installed. The SDK enables you to retrieve that deep link when your app first runs after installation.
+
+N.B. For this to work the App Setting *If the App is not installed, fall back to* on the Deeplink.me portal must be selected to be *The App Store/Google Play URL*.
+
+Call the `getAssociatedInstallationLinkWithOptions:appID:timeout:completion:` method. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method. You do *not* need to conditionally call this method as it does nothing except on it's first call after a fresh install and during a normal launch (`launchOptions` are `nil`)
+
+If this method returns `NO` then you should continue launching the app as normal and the completion block will *not* be called; otherwise you might want to prevent state restoration until the completion block has the chance to return.
+
+The completion block passes a `url` and an `error` object. Your app should handle any non-`nil` launch URL appropriately.
+
+A `nil` `url` should probably be handled by proceed with normal state restoration, assuming it was delayed until now. A `nil` `error` signifies that the `nil` `url` is a result of no launch URL being available.
+
+```objc
+    self.waitingForInstallationLink = [AppWordsSDK getAssociatedInstallationLinkWithOptions:launchOptions appID:APP_ID timeout:2.0 completion:^(NSURL *url, NSError *error) {
+        if (url != nil) {
+            [self.window.rootViewController performSegueWithIdentifier:@"DeeplinkSegue" sender:url];
+        }
+        else {
+            [self.window.rootViewController performSegueWithIdentifier:@"NormalLaunchSegue" sender:nil];
+        }
+    }];
+```
+
+Notes:
+
+* The completion handler will be called on the main thread.
+
+* The `APP_ID` is the unique app ID, assigned to the app on creating a new one.
+
+* The `timeout` will limit the time allotted to retrieving any launch URL. Remember that the first run is first experience that the user has with your app, so do not keep them waiting an unreasonable amount of time.
+
+
+## Becoming part of the AppWords network of apps
+
+When the user has finishing interacting with your app, you may want to offer them relevant 'next steps' to perform.
+
+The AppWords SDK can provide deep links to other apps in the AppWords network based on your criteria.
+
+### *Obtaining a deep link*
 
 Just call the `getLinkWithKeywords:completion:` method.
 
@@ -126,7 +164,7 @@ The `deeplink` is a `DLMELink` object that encapsulates information for displayi
     if (! error) {
         [deeplink open:(^(BOOL succeeded) {
             if (succeeded) {
-                NSLog(@"Opened deeplink: %@", deeplink.title);
+                NSLog(@"Opened deep link: %@", deeplink.title);
             }
         })];
     }
@@ -188,9 +226,34 @@ This restricts results to apps which correspond to a specific website domain. Th
 
 e.g. `iPhone cases host:etsy.com` *[iPhone cases on Etsy]*
 
-### *3) Handle your app being opened from a deeplink*
+### *Displaying a deep link*
 
-Your app will need to register a custom URL Scheme before it can receive incoming deeplinks. Please see our [Deeplinkme documentation](https://portal.deeplink.me/documentation#documentation-and-support-schemes-and-url-handling) for details.
+You may present the deep link to the user in anyway that makes sense for your app, but to retain consistency the SDK includes two styles of preformatted views ­ DLMEView and DLMEViewLight.
+
+```objc
+#import <AppWordsSDK/DLMEViewLight.h>
+....
+UIView *resultView = (UIView*)[DLMEViewLight viewForDeeplink:deeplink enableLocation:isLocationEnabled];
+```
+
+```objc
+#import <AppWordsSDK/DLMEView.h>
+....
+UIView *resultView = (UIView*)[DLMEView viewForDeeplink:deeplink];
+```
+
+Notes:
+
+* The `deeplink` parameter is the `DLMELink` object to be displayed.
+
+* The `DLMEViewLight` view has two variants selected by the value of the `enableLocation` parameter.
+
+* Each of these view will try to open the associated deep link when tapped.
+
+
+### *Handle your app being opened from a deep link*
+
+Your app will need to register a custom URL Scheme before it can receive incoming deep links. Please see our [Deeplinkme documentation](https://portal.deeplink.me/documentation#documentation-and-support-schemes-and-url-handling) for details.
 
 For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in  `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
 
@@ -202,7 +265,9 @@ The `API_KEY` is the unique developer ID, assigned to you on registering for a D
 
 Note that the SDK need not be initialized before calling this method.
 
-### *3) Adding pages to the AppWords index (iOS 9 Only)*
+## Adding pages to the AppWords index
+
+**This feature only works on iOS 9**
 
 AppWords provides an easy way to leverage Apple's new [iOS Search APIs](https://developer.apple.com/videos/wwdc/2015/?id=709).  After you prepare a `CSSearchableItem` or `NSUserActivity` object, pass it to the appropriate AppWords method for inclusion in our search index.
 
@@ -216,12 +281,12 @@ Here is the list of attributes in `CSSearchableItemAttributeSet` that will be in
 * `latitude`, `longitude`: any relevant physical coordinates, e.g. physical location of a restaurant represented by the page
 * `contentType`: uniform type identifier (see Apple [documentation](https://developer.apple.com/library/ios/documentation/General/Conceptual/DevPedia-CocoaCore/UniformTypeIdentifier.html))
 * `contentTypeTree`: custom hierarchy of uniform type identifiers (see Apple [documentation](https://developer.apple.com/library/ios/documentation/General/Conceptual/DevPedia-CocoaCore/UniformTypeIdentifier.html))
-* `relatedUniqueIdentifier`: this should be identical to the
-  `uniqueIdentifier` of any  `CSSearchableItem` representing the same page (see below)
+* `relatedUniqueIdentifier`: this should be identical to the `uniqueIdentifier` of any  `CSSearchableItem` representing the same page (see below)
 
 Other indexed data will be specified with the appropriate method.
 
 **N.B.** `webpageURL` (see below) must uniquely identify each app page -- do not use a generic homepage url for multiple app pages!  The URL's hostname must *exactly* match the hostname you have declared on the AppWords portal.
+
 
 #### *NSUserActivity*
 
@@ -265,9 +330,9 @@ AppWords will also index the following method parameters:
 
 **Q: I'm getting strange compiler/linker errors to do with CoreSpotlight**
 
-A: Core Spotlight is a new feature of iOS 9, but is used by this SDK for AppWords indexing. We have included a dummy CoreSpotlight.framework so that projects built using Xcode versions < 7 can link without errors. However, if this dummy framework is present then Xcode 7 may fail to compile/link the project. See [Integration Steps](#integration-steps) to learn how to set up your Xcode Project correctly.
+A: Core Spotlight is a new feature of iOS 9, but is used by this SDK for AppWords indexing. We have included a dummy CoreSpotlight.framework so that projects built using *Xcode* versions < 7 can link without errors. However, if this dummy framework is present then *Xcode 7* may fail to compile/link the project. See [Integration Steps](#integration-steps) to learn how to set up your *Xcode* Project correctly.
 
-Note that you may have to delete the Pods folder, and perform a new `pod install` when switching Xcode versions.
+Note that you may have to delete the Pods folder, and perform a new `pod install` when switching *Xcode* versions.
 
 **Q: What errors are returned by the SDK?**
 
@@ -275,17 +340,17 @@ A: The SDK uses `NSError` instances to report errors. Every `NSError` instance r
 
 **Q: The SDK takes a long time to initialize; is something wrong?**
 
-A: Before retrieving deeplinks the SDK needs to scan your device for Deeplink AppWords apps. This can take time, especially since the SDK does this happens *off* the main thread at a low priority.
+A: Before retrieving deep links the SDK needs to scan your device for Deeplink AppWords apps. This can take time, especially since the SDK does this happens *off* the main thread at a low priority.
 
-It may also be the case that your device is not connected to the internet. The SDK handles this scenario intelligently by waiting until there is a connection, rather than immediately failing. You will see any connection errors logged in the Xcode debug console.
+It may also be the case that your device is not connected to the internet. The SDK handles this scenario intelligently by waiting until there is a connection, rather than immediately failing. You will see any connection errors logged in the *Xcode* debug console.
 
-**Q: I am not getting any deeplinks when testing in the simulator**
+**Q: I am not getting any deep links when testing in the simulator**
 
-A: The SDK will link with your app for the simulator, but is hardwired to succeed initialization and fail to retrieve any deeplinks. However, the SDK *will* correctly strip AppWords tokens from a URL passed to `handleOpenURL:apiKey:`
+A: The SDK will link with your app for the simulator, but is hardwired to succeed initialization and fail to retrieve any deep links. However, the SDK *will* correctly strip AppWords tokens from a URL passed to `handleOpenURL:apiKey:`
 
-**Q:  I am not getting any deeplinks when testing on a device**
+**Q:  I am not getting any deep links when testing on a device**
 
-A: The SDK only returns deeplinks to installed apps and, even then, only to those apps for which are in the AppWords network. A good app to install for testing purposes is TripAdvisor or, alternatively, Booking.com
+A: The SDK only returns deep links to installed apps and, even then, only to those apps for which are in the AppWords network. A good app to install for testing purposes is TripAdvisor or, alternatively, Booking.com
 
 Another way to test the connection to the server is using the *AppWordsSDKExample* app, available from our *git* repository:
 
@@ -297,13 +362,13 @@ Another way to test the connection to the server is using the *AppWordsSDKExampl
 
 The *AppWordsSDKExample* app registers the Custom URL Scheme `AppWordsSDKExample` to enable this magic to happen.
 
-**Q:  HELP!!! I am STILL not getting any deeplinks even when testing on a device!**
+**Q:  HELP!!! I am STILL not getting any deep links even when testing on a device!**
 
-A: Are you testing on iOS 9? If so, be aware that Apple has changed the rules, and you will need to edit your Info.plist. See [Initializing](#1-initializing) for details.
+A: Are you testing on iOS 9? If so, be aware that Apple has changed the rules, and you will need to edit your Info.plist. See [Initializing](#initializing) for details.
 
-**Q:  ARRGGHHH! WHERE ARE MY DEEPLINKS ON THE DEVICE????!!!????!!!**
+**Q:  ARRGGHHH! WHERE ARE MY DEEP LINKS ON THE DEVICE????!!!????!!!**
 
-A: The SDK respects the *Limit Ad Targeting* setting on the device by not sending any data to Deeplink.me. This means that no deeplinks are currently sent to the device. Please ensure that *Limit Ad Targeting* is turned off on your test device.
+A: The SDK respects the *Limit Ad Targeting* setting on the device by not sending any data to Deeplink.me. This means that no deep links are currently sent to the device. Please ensure that *Limit Ad Targeting* is turned off on your test device.
 
 **Please be in touch if you have any additional questions!**
 
