@@ -7,6 +7,8 @@
 //
 
 #import "SearchViewController.h"
+#import "ViewController.h"
+
 #import <AppWordsSDK/AppWordsSDK.h>
 
 #ifdef __IPHONE_9_0
@@ -28,9 +30,17 @@ static NSString *trimmedStringFromString(NSString *string) {
 @property (weak, nonatomic) IBOutlet UILabel *errorCode;
 @property (weak, nonatomic) IBOutlet UITextView *errorMessage;
 
+@property (nonatomic, strong) id<NSObject> notifier;
 @end
 
 @implementation SearchViewController
+
+- (void)dealloc {
+    if (self.notifier != nil) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self.notifier];
+        self.notifier = nil;
+    }
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -43,6 +53,21 @@ static NSString *trimmedStringFromString(NSString *string) {
     if (self.userActivity != nil) {
         [self restoreTextFieldsFromActivity:self.userActivity];
     }
+    
+    self.notifier = [[NSNotificationCenter defaultCenter] addObserverForName:kSearchWordsURINotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull notification)
+     {
+         [self performSegueWithIdentifier:@"UnwindToViewControllerSegue" sender:notification.object];
+     }];
+}
+
+- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
+    if ([segue.destinationViewController isKindOfClass:[ViewController class]] &&
+        [sender isKindOfClass:[NSURL class]])
+    {
+        ViewController *viewController = segue.destinationViewController;
+        [viewController setKeywordsWithURL:sender];
+    }
+
 }
 
 - (void)prepareForAPICall {

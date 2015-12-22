@@ -67,7 +67,11 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>&quot;test&quot;</string>
+	<string>In Use Location</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Location</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Always Location</string>
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>demo.appwordssdkexample.pages</string>

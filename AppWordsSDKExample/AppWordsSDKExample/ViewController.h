@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+extern NSString *kSearchWordsURINotification;
+
 @interface ViewController : UIViewController 
-@property (nonatomic) NSURL *url;
+- (void)setKeywordsWithURL:(NSURL *)url;
 @end
 

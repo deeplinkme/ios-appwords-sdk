@@ -16,7 +16,7 @@
     if ([segue.destinationViewController isKindOfClass:[ViewController class]])
     {
         ViewController *viewController = segue.destinationViewController;
-        viewController.url = self.url;
+        [viewController setKeywordsWithURL:self.url];
     }
 }
 

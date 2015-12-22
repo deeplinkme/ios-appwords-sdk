@@ -22,6 +22,8 @@
 #import <MobileCoreServices/UTCoreTypes.h>
 #endif
 
+NSString *kSearchWordsURINotification = @"SearchWordsURI";
+
 @interface SearchField : UITextField
 @property (nonatomic, assign) UIEdgeInsets edgeInsets;
 @end
@@ -78,6 +80,9 @@
 @property (nonatomic, getter=isLocationEnabled) BOOL locationEnabled;
 @property (nonatomic) float longitude;
 
+@property (nonatomic, strong) id<NSObject> notifier;
+@property (nonatomic) NSURL *url;
+
 - (IBAction)onSwitchUI:(id)sender;
 - (IBAction)onEditSearch:(id)sender;
 
@@ -86,6 +91,13 @@
 @end
 
 @implementation ViewController
+
+- (void)dealloc {
+    if (self.notifier != nil) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self.notifier];
+        self.notifier = nil;
+    }
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -108,6 +120,13 @@
             }
         });
     }];
+    
+    self.notifier = [[NSNotificationCenter defaultCenter] addObserverForName:kSearchWordsURINotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification * _Nonnull notification)
+                     {
+                         if (self.presentedViewController == nil) {
+                             [self setKeywordsWithURL:notification.object];
+                         }
+                     }];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -133,13 +152,7 @@
 
     self.keywordsTextField.rightView = locationButton;
     self.keywordsTextField.rightViewMode = UITextFieldViewModeAlways;
-    self.keywordsTextField.text = @"";
-    if (self.url != nil) {
-        NSArray<NSString *> *components = [[self.url absoluteString] componentsSeparatedByString:@"AppWordsSDKexample:/"];
-        if (components.count == 2 && components[0].length == 0) {
-            self.keywordsTextField.text = [components[1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        }
-    }
+    [self setKeywordsWithURL:self.url];
     self.keywordsTextField.edgeInsets = UIEdgeInsetsMake(0, 14, 0, 0);
     self.keywordsTextField.layer.borderWidth = 1;
     self.keywordsTextField.layer.borderColor = [UIColor colorWithRed:245.0/255.0 green:245.0/255.0 blue:245.0/255.0 alpha:1].CGColor;
@@ -174,6 +187,26 @@
         self.locationManager.pausesLocationUpdatesAutomatically = YES;
     }
 }
+
+- (void)setKeywordsWithURL:(NSURL *)url {
+    if (self.keywordsTextField.text == nil) {
+        self.url = url;
+    }
+    else {
+        if (url == nil) {
+            self.keywordsTextField.text = @"";
+        }
+        else {
+            NSString *urlString = [[url absoluteString] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSRange range = [urlString rangeOfString:@"AppWordsSDKexample:/"
+                                             options:(NSAnchoredSearch | NSCaseInsensitiveSearch)];
+            if (range.location != NSNotFound) {
+                self.keywordsTextField.text = [urlString substringFromIndex:range.length];
+            }
+        }
+    }
+}
+
 
 -(void) onLocation
 {

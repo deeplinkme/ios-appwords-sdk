@@ -10,6 +10,7 @@
 #import <AppWordsSDK/AppWordsSDK.h>
 
 #import "ApiConstants.h"
+#import "ViewController.h"
 #import "SearchViewController.h"
 
 #ifdef __IPHONE_9_0
@@ -28,7 +29,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.justLaunched = YES;
-    self.waitingForInstallationLink = [AppWordsSDK getAssociatedInstallationLinkWithOptions:launchOptions appID:APP_ID timeout:1.0 completion:^(NSURL *url, NSError *error) {
+    self.waitingForInstallationLink = [AppWordsSDK getAssociatedInstallationLinkWithOptions:launchOptions appID:APP_ID errorURLBase:@"appwordssdkexample:/bad" timeout:5.0 completion:^(NSURL *url, NSError *error) {
         if (url != nil) {
             [self.window.rootViewController performSegueWithIdentifier:@"DeeplinkSegue" sender:url];
         }
@@ -71,6 +72,12 @@
 
 -(BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
     url = [AppWordsSDK handleOpenURL:url apiKey:API_KEY];
+    if (url == nil) {
+        return NO;
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:kSearchWordsURINotification object:url];
+
     return YES;
 }
 

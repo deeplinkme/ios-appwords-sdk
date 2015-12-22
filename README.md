@@ -19,7 +19,7 @@
 
 The *AppWordsSDKExample* app is also available from our CocoaPods *git* repository; feel free to use the source files as a basis for your own SDK integration.
 
-## Integration Steps
+## <a name="integration-steps"></a>Integration Steps
 
 ### *CocoaPods*
 
@@ -45,7 +45,7 @@ To access the SDK from your code, you will need to import the SDK header file:
 #import <AppWordsSDK/AppWordsSDK.h>
 ```
 
-### *Initializing*
+### <a name="initializing"></a>*Initializing*
 
 Before retrieving deep links or indexing pages, the SDK needs to scan your device for deep-linkable AppWords apps. This happens off the main thread, and should consume negligible resources. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method.
 
@@ -108,30 +108,37 @@ Notes:
 
 
 
-## Retrieving a launch URL associated with an installation
+## <a name="retrieving-a-launch-url-associated-with-an-installation"></a>Retrieving a launch URL associated with an installation
 
 A deep link can fail to open your app because the app itself is not installed. The SDK enables you to retrieve that deep link when your app first runs after installation.
 
 N.B. For this to work the App Setting *If the App is not installed, fall back to* on the Deeplink.me portal must be selected to be *The App Store/Google Play URL*.
 
-Call the `getAssociatedInstallationLinkWithOptions:appID:timeout:completion:` method. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method. You do *not* need to conditionally call this method as it does nothing except on it's first call after a fresh install and during a normal launch (`launchOptions` are `nil`)
+Call the `getAssociatedInstallationLinkWithOptions:appID:errorURLBase:timeout:completion:` method. You may wish call this method in your App Delegate’s *application:didFinishLaunchingWithOptions:* method. You do *not* need to conditionally call this method as it does nothing except on it's first call after a fresh install and during a normal launch (`launchOptions` are `nil`)
 
 If this method returns `NO` then you should continue launching the app as normal and the completion block will *not* be called; otherwise you might want to prevent state restoration until the completion block has the chance to return.
 
 The completion block passes a `url` and an `error` object. Your app should handle any non-`nil` launch URL appropriately.
 
-A `nil` `url` should probably be handled by proceed with normal state restoration, assuming it was delayed until now. A `nil` `error` signifies that the `nil` `url` is a result of no launch URL being available.
+A `nil` `url` should probably be handled by proceeding with normal state restoration, assuming it was delayed until now. A `nil` `error` signifies that the `nil` `url` is a result of no launch URL being available.
+
+**N.B. `getAssociatedInstallationLinkWithOptions:appID:errorURLBase:timeout:completion:` cannot function properly without `handleOpenURL:apiKey:` processing incoming app links. See [the relevant section below](#handle-your-app-being-opened-from-a-deep-link).**
 
 ```objc
-    self.waitingForInstallationLink = [AppWordsSDK getAssociatedInstallationLinkWithOptions:launchOptions appID:APP_ID timeout:2.0 completion:^(NSURL *url, NSError *error) {
-        if (url != nil) {
-            [self.window.rootViewController performSegueWithIdentifier:@"DeeplinkSegue" sender:url];
-        }
-        else {
-            [self.window.rootViewController performSegueWithIdentifier:@"NormalLaunchSegue" sender:nil];
-        }
-    }];
+self.waitingForInstallationLink = [AppWordsSDK getAssociatedInstallationLinkWithOptions:launchOptions
+                                                                                  appID:APP_ID
+                                                                           errorURLBase:@"myapp://error"
+                                                                                timeout:2.0
+                                                                             completion:^(NSURL *url, NSError *error) {
+    if (url != nil) {
+        [self.window.rootViewController performSegueWithIdentifier:@"DeeplinkSegue" sender:url];
+    }
+    else {
+        [self.window.rootViewController performSegueWithIdentifier:@"NormalLaunchSegue" sender:nil];
+    }
+}];
 ```
+
 
 Notes:
 
@@ -139,10 +146,13 @@ Notes:
 
 * The `APP_ID` is the unique app ID, assigned to the app on creating a new one.
 
-* The `timeout` will limit the time allotted to retrieving any launch URL. Remember that the first run is first experience that the user has with your app, so do not keep them waiting an unreasonable amount of time.
+* The `errorURLBase` consists of your app's custom URL Scheme followed by a path that will never appear in a normal app link to your app. It will be used to report errors to the app.
 
+* The `timeout` will limit the time allotted to retrieving any launch URL. Remember that the first run is the first experience that the user has with your app, so do not keep them waiting an unreasonable amount of time.
 
-## Becoming part of the AppWords network of apps
+* The SDK need not be initialized before calling this method.
+
+## <a name="becoming-part-of-the-appwords-network-of-apps"></a>Becoming part of the AppWords network of apps
 
 When the user has finishing interacting with your app, you may want to offer them relevant 'next steps' to perform.
 
@@ -251,21 +261,26 @@ Notes:
 * Each of these view will try to open the associated deep link when tapped.
 
 
-### *Handle your app being opened from a deep link*
+### <a name="handle-your-app-being-opened-from-a-deep-link"></a>*Handle your app being opened from a deep link*
 
 Your app will need to register a custom URL Scheme before it can receive incoming deep links. Please see our [Deeplinkme documentation](https://portal.deeplink.me/documentation#documentation-and-support-schemes-and-url-handling) for details.
 
-For tracking purposes, your app must call `handleOpenURL:apiKey:` in your App Delegate, either in  `application:handleOpenURL:` or in `application:openURL:sourceApplication:annotation:`
+For tracking purposes - and for proper handling of launch URLs - your app must call `handleOpenURL:apiKey:` in your App Delegate, either in `application:openURL:options:`, `application:handleOpenURL:` (deprecated), or `application:openURL:sourceApplication:annotation:` (deprecated)
+
+`handleOpenURL:apiKey:` returns an `NSURL` with any SDK specific information stripped out. Please use the returned `NSURL`, rather than the original, and ignore completely if the returned value is `nil`.
 
 ```objc
-[AppWordsSDK handleOpenURL:url apiKey:@"API_KEY"];
+url = [AppWordsSDK handleOpenURL:url apiKey:@"API_KEY"];
+if (url == nil) {
+    return NO;
+}
 ```
 
 The `API_KEY` is the unique developer ID, assigned to you on registering for a Deeplink account.
 
 Note that the SDK need not be initialized before calling this method.
 
-## Adding pages to the AppWords index
+## <a name="adding-pages-to-the-appwords-index"></a>Adding pages to the AppWords index
 
 **This feature only works on iOS 9**
 
