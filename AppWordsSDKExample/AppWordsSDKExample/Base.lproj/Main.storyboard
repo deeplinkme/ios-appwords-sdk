@@ -48,7 +48,7 @@
                                         </constraints>
                                         <color key="textColor" red="0.57647058823529407" green="0.57647058823529407" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <fontDescription key="fontDescription" name="OpenSans" family="Open Sans" pointSize="13"/>
-                                        <textInputTraits key="textInputTraits"/>
+                                        <textInputTraits key="textInputTraits" keyboardType="twitter"/>
                                         <connections>
                                             <action selector="onEditSearch:" destination="vXZ-lx-hvc" eventType="editingChanged" id="4Nb-C8-Xy6"/>
                                         </connections>

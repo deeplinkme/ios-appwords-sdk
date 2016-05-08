@@ -134,8 +134,8 @@ typedef enum : NSUInteger {
      * @param apiKey    The unique developer ID, assigned to you on registering for a Deeplinkme account.
      * @return The input URL stripped of any AppWords tracking information, if any was found. Otherwise,
      * the original URL is returned. In the case of an installation deeplink, `nil` is returned, and the URL should be ignored.
-     * @discussion  When your app is opened through a deeplink, one of `application:openURL:options:`, `application:handleOpenURL:` (deperecated),
-     * or `application:openURL:sourceApplication:annotation:` (deperecated) is called, passing in the deeplink as a URL.
+     * @discussion  When your app is opened through a deeplink, one of `application:openURL:options:`, `application:handleOpenURL:` (deprecated),
+     * or `application:openURL:sourceApplication:annotation:` (deprecated) is called, passing in the deeplink as a URL.
      *
      * Before handling the URL, call this method to ensure accurate tracking of incoming deeplinks.
      *
